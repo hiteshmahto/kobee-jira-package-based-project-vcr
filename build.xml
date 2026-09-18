@@ -1,30 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="KobeePackageApp" default="build" basedir=".">
+<project name="CyntexaDemo-Git" default="main" basedir=".">
 
-    <!-- Kobee automatically passes ${source} and ${target} to this script -->
+    <!-- Force Ant to load Kobee's generated property file -->
+    <property file="alm_ant.properties" />
 
-    <target name="init">
-        <echo message="Kobee Source Dir: ${source}" />
-        <echo message="Kobee Target Dir: ${target}" />
-        <!-- Create a temporary folder to hold the compiled .class files -->
-        <mkdir dir="${source}/classes"/>
-    </target>
+    <target name="check-params">
+        <echo message="=================================================="/>
+        <echo message="[DEBUG] Raw build.version value = '${build.version}'"/>
+        <echo message="=================================================="/>
 
-    <target name="compile" depends="init">
-        <echo message="Compiling the selected Java files..."/>
-        <!-- Compile only the files that Kobee downloaded into the source folder -->
-        <javac srcdir="${source}/src" destdir="${source}/classes" includeantruntime="false"/>
-    </target>
+        <condition property="invalidParameter">
+            <or>
+                <!-- Match default string or substring (handles trailing spaces) -->
+                <equals arg1="${build.version}" arg2="MUST_OVERRIDE" />
+                <contains string="${build.version}" substring="MUST_OVERRIDE" />
+                <!-- Match unassigned literal -->
+                <equals arg1="${build.version}" arg2="$${build.version}" />
+                <!-- Property missing completely -->
+                <not>
+                    <isset property="build.version" />
+                </not>
+            </or>
+        </condition>
 
-    <target name="build" depends="compile">
-        <echo message="Packaging into a JAR file..."/>
-        <!-- Create the executable JAR and put it directly in the Kobee Target folder -->
-        <jar destfile="${target}/KobeeDemoApp.jar" basedir="${source}/classes">
-            <manifest>
-                <attribute name="Main-Class" value="com.kobee.demo.Main"/>
-            </manifest>
-        </jar>
-        <echo message="Success! The JAR file is in the target folder ready for Kobee to archive."/>
-    </target>
+        <fail if="invalidParameter" message="ERROR: The 'build.version' parameter was NOT provided or overridden in the API request payload!" />
+    </target>
+
+    <target name="main" depends="check-params">
+        <echo message="[GIT BUILD] Validation passed! build.version = ${build.version}"/>
+    </target>
+
+    <target name="build" depends="check-params">
+        <echo message="[GIT BUILD] Validation passed! build.version = ${build.version}"/>
+    </target>
+
+    <target name="compile" depends="check-params">
+        <echo message="[GIT BUILD] Validation passed! build.version = ${build.version}"/>
+    </target>
 
 </project>
